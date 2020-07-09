@@ -1,0 +1,14 @@
+language: python
+python:
+    - "3.8"
+install:
+    # You may not need these first two, but they can help
+    - python -m pip install --upgrade pip
+    - python -m pip install --upgrade setuptools
+    - python -m pip install -r requirements.txt
+    # Commenting this out, but to install your own package:
+    # - python -m pip install .
+script:
+    # I'm supressing a specific warning, usually below is fine
+    # - python -m pytest
+    - python -Wignore:::_pytest.assertion.rewrite -m pytest tests/

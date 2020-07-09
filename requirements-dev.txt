@@ -1,0 +1,13 @@
+matplotlib==3.0.2
+numpy==1.15.4
+PyInstaller
+pywin32
+pytest
+pydocstyle
+docformatter
+pdoc3
+setuptools
+sphinx
+m2r
+sphinxcontrib-apidoc
+sphinx_rtd_theme
