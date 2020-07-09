@@ -1,12 +1,11 @@
-Welcome to your_package's documentation!
-========================================
+Neuroscience analysis
+=====================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   readme
-   reference/your_package
+   reference/neuronal
 
 
 Indices and tables

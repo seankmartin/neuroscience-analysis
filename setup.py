@@ -28,23 +28,26 @@ LONG_DESCRIPTION = read("README.md")
 LONG_DESCRIPTION_CONTENT_TYPE = "text/markdown"
 
 # Populate this with your information
-DISTNAME = "package_name"
-DESCRIPTION = "short_summary"
-MAINTAINER = "you"
-MAINTAINER_EMAIL = "your_email"
-URL = "your_online_repo"
-LICENSE = "short_string"  # For example "GNU-GPLv3"
+DISTNAME = "neuronal"
+DESCRIPTION = "Neuroscience analysis"
+MAINTAINER = "Sean Martin"
+MAINTAINER_EMAIL = "martins7@tcd.ie"
+URL = "https://github.com/seankmartin/neuroscience-analysis"
+LICENSE = "MIT"  # For example "GNU-GPLv3"
 
 # Include only strictly necessary packages here
 # As a comma separated list of requirements
 # Full requirements should be listed in requirements.txt
 # Supports just "name", "name == version", or "name >= version".
-INSTALL_REQUIRES = []
+INSTALL_REQUIRES = [
+    "numpy",
+    "matplotlib",
+]
 
 # List individual packages provided by your repository here
 # Often this is just the single name, your_package
 PACKAGES = [
-    "your_package",
+    "neuronal",
 ]
 
 # A list of classifiers from https://pypi.org/classifiers/

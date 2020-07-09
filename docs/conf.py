@@ -22,9 +22,9 @@ sys.path.append(package_location)
 
 # -- Project information -----------------------------------------------------
 
-project = "your_package"
-copyright = "2020, you"
-author = "you"
+project = "simuran"
+copyright = "2020, Sean Martin"
+author = "Sean Martin"
 
 
 def parse_version(fname):
@@ -103,7 +103,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "reference/modules.rst"]
 pygments_style = None
 
 # -- API_DOC Configuration
-apidoc_module_dir = "../your_package"
+apidoc_module_dir = "../neuronal"
 apidoc_output_dir = "reference"
 apidoc_excluded_paths = ["tests"]
 apidoc_separate_modules = True
@@ -124,7 +124,7 @@ html_theme = "sphinx_rtd_theme"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ["_static"]
+html_static_path = []
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
@@ -217,14 +217,3 @@ epub_exclude_files = ["search.html"]
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
-
-from m2r import MdInclude
-
-
-def setup(app):
-    # from m2r to make `mdinclude` work
-    app.add_config_value("no_underscore_emphasis", False, "env")
-    app.add_config_value("m2r_parse_relative_links", False, "env")
-    app.add_config_value("m2r_anonymous_references", False, "env")
-    app.add_config_value("m2r_disable_inline_math", False, "env")
-    app.add_directive("mdinclude", MdInclude)
