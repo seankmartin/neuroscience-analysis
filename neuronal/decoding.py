@@ -119,7 +119,7 @@ class LFPDecoder(object):
                     )
                 )
         else:
-            raise ValueError("Unrecognised feature type {}".format(feature_type))
+            raise ValueError("Unrecognised feature type {}".format(features))
         self.features = features
 
     def get_features(self):
