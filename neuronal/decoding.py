@@ -3,6 +3,7 @@ import os
 
 import numpy as np
 import scipy.stats
+import mne
 
 
 class LFPDecoder(object):
@@ -414,6 +415,34 @@ def window_features(data, window_sample_len=10, step=8):
 
     return features
 
+def random_white_noise(epochs, channels, samples_per_epoch, mean=0, std=1):
+    """
+    Generate a random white noise signal as Epochs in MNE.
+
+    Parameters
+    ----------
+    epochs : int
+    channels : int
+    samples_per_epoch : int
+    mean : float, optional
+    std : float, optional
+
+    Returns
+    -------
+    mne.Epochs
+
+    """
+    num_samples = epochs * channels * samples_per_epoch
+    samples = np.random.normal(loc=mean, scale=std, size=num_samples)
+    random_data = samples.reshape(epochs, channels, samples_per_epoch)
+
+    sfreq = 250
+    ch_types = ["eeg"] * channels
+    ch_names = [str(i) for i in range(channels)]
+    info = mne.create_info(ch_names=ch_names, sfreq=sfreq, ch_types=ch_types)
+    mne_epochs = mne.EpochsArray(random_data, info)
+
+    return mne_epochs
 
 def random_decoding(output_folder):
     """
@@ -426,7 +455,6 @@ def random_decoding(output_folder):
     output_folder : str
         Where to store outputs
     """
-    from bvmpc.bv_mne import random_white_noise
     from pprint import pprint
 
     # Just random white noise signal
