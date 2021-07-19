@@ -3,7 +3,6 @@ import os
 
 import numpy as np
 import scipy.stats
-import mne
 
 
 class LFPDecoder(object):
@@ -47,8 +46,8 @@ class LFPDecoder(object):
 
     def __init__(
         self,
+        labels,
         mne_epochs=None,
-        labels=None,
         label_names=None,
         selected_data=None,
         sample_rate=250,
@@ -63,6 +62,8 @@ class LFPDecoder(object):
         self.mne_epochs = mne_epochs
         self.labels = np.array(labels)
         self.label_names = label_names
+        if self.label_names is None:
+            self.label_names = [str(label) for label in self.labels]
         self.selected_data = selected_data
         self.sample_rate = sample_rate
         self.set_classifier(clf, param_dist, clf_params)
@@ -77,15 +78,7 @@ class LFPDecoder(object):
 
     def get_labels_as_str(self):
         """Return the friendly name version of the labels."""
-        label_dict = {}
-        output = []
-        idx = 0
-        for val in self.get_labels():
-            if val not in label_dict:
-                label_dict[val] = self.label_names[idx]
-                idx += 1
-            output.append(label_dict[val])
-        return output
+        return self.label_names
 
     def get_data(self):
         """
@@ -206,7 +199,7 @@ class LFPDecoder(object):
     def hyper_param_search(
         self,
         n_top=3,
-        scoring=["accuracy", "balanced_accuracy"],
+        scoring="balanced_accuracy",
         set_params=True,
         verbose=False,
     ):
@@ -219,8 +212,8 @@ class LFPDecoder(object):
             Defaults to 3.
             The number of top parameter results to return.
         scoring : list of str, optional. 
-            Defaults to ["accuracy", "balanced_accuracy"]
-            Sklearn compatible list of function names.
+            Defaults to "balanced_accuracy"
+            Sklearn compatible list of function names, or a function name.
         set_params : bool, optional.
             Defaults to True.
             Whether to set the best parameters found on the classifier.
@@ -256,7 +249,7 @@ class LFPDecoder(object):
         labels = self.get_labels()
 
         random_search = RandomizedSearchCV(
-            clf, param_distributions=param_dist, n_iter=30, cv=cv
+            clf, param_distributions=param_dist, n_iter=30, cv=cv, scoring=scoring
         )
         random_search.fit(features, labels)
 
@@ -275,17 +268,12 @@ class LFPDecoder(object):
         """
         from sklearn.metrics import classification_report
 
-        labels = []
-        for val in self.labels:
-            if val not in labels:
-                labels.append(val)
-
         print("Actual   :", true)
         print("Predicted:", predicted)
         return classification_report(
             true,
             predicted,
-            labels=labels,
+            labels=self.labels,
             target_names=self.label_names,
             output_dict=as_dict,
         )
@@ -302,13 +290,12 @@ class LFPDecoder(object):
         import matplotlib.pyplot as plt
         import pandas as pd
 
-        from bvmpc.bv_utils import make_dir_if_not_exists
-
         features = self.get_features()
         labels = self.get_labels_as_str()
         label_sort_args = np.argsort(labels)
 
-        make_dir_if_not_exists(output_folder)
+        print("Plotting feature visualisation to {}".format(output_folder))
+        os.makedirs(output_folder, exist_ok=True)
         # PCA plot
         fig, ax = plt.subplots(figsize=(10, 8))
         out_loc = os.path.join(output_folder, "2d_pca.png")
@@ -317,7 +304,7 @@ class LFPDecoder(object):
         std_data = scaler.fit_transform(features)
         after_pca = pca.fit_transform(std_data)
         sns.scatterplot(
-            after_pca[:, 0], after_pca[:, 1], style=labels, hue=labels, ax=ax
+            x=after_pca[:, 0], y=after_pca[:, 1], style=labels, hue=labels, ax=ax
         )
         fig.savefig(out_loc, dpi=dpi)
 
@@ -428,36 +415,6 @@ def window_features(data, window_sample_len=10, step=8):
     return features
 
 
-def random_white_noise(epochs, channels, samples_per_epoch, mean=0, std=1):
-    """
-    Generate a random white noise signal as Epochs in MNE.
-
-    Parameters
-    ----------
-    epochs : int
-    channels : int
-    samples_per_epoch : int
-    mean : float, optional
-    std : float, optional
-
-    Returns
-    -------
-    mne.Epochs
-
-    """
-    num_samples = epochs * channels * samples_per_epoch
-    samples = np.random.normal(loc=mean, scale=std, size=num_samples)
-    random_data = samples.reshape(epochs, channels, samples_per_epoch)
-
-    sfreq = 250
-    ch_types = ["eeg"] * channels
-    ch_names = [str(i) for i in range(channels)]
-    info = mne.create_info(ch_names=ch_names, sfreq=sfreq, ch_types=ch_types)
-    mne_epochs = mne.EpochsArray(random_data, info)
-
-    return mne_epochs
-
-
 def random_decoding(output_folder):
     """
     Perform a full decoding pipeline from random white noise.
@@ -468,8 +425,8 @@ def random_decoding(output_folder):
     ----------
     output_folder : str
         Where to store outputs
-
     """
+    from bvmpc.bv_mne import random_white_noise
     from pprint import pprint
 
     # Just random white noise signal
@@ -480,8 +437,8 @@ def random_decoding(output_folder):
     target_names = ["Random OFF", "Random ON"]
 
     decoder = LFPDecoder(
-        mne_epochs=random_epochs,
         labels=labels,
+        mne_epochs=random_epochs,
         label_names=target_names,
         cv_params={"n_splits": 100},
     )
