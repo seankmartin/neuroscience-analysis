@@ -283,7 +283,7 @@ class LFPDecoder(object):
         """Give mean +- 1.96 vals for a key in cross val result."""
         return confidence_interval_estimate(self.cross_val_result, key)
 
-    def visualise_features(self, output_folder, dpi=300):
+    def visualise_features(self, output_folder, name="", dpi=300):
         """Plot 2d PCA and heatmap of features."""
         from sklearn.decomposition import PCA
         from sklearn.preprocessing import StandardScaler
@@ -299,7 +299,7 @@ class LFPDecoder(object):
         os.makedirs(output_folder, exist_ok=True)
         # PCA plot
         fig, ax = plt.subplots(figsize=(10, 8))
-        out_loc = os.path.join(output_folder, "2d_pca.png")
+        out_loc = os.path.join(output_folder, f"2d_pca{name}.png")
         pca = PCA(n_components=2)
         scaler = StandardScaler()
         std_data = scaler.fit_transform(features)
@@ -311,7 +311,7 @@ class LFPDecoder(object):
 
         # Heatmap of raw features sorted by label
         fig, ax = plt.subplots()
-        out_loc = os.path.join(output_folder, "feature_heatmap.png")
+        out_loc = os.path.join(output_folder, f"feature_heatmap{name}.png")
         sorted_features = features[label_sort_args]
         sorted_labels = np.array(labels)[label_sort_args]
         columns = [str(i) for i in range(len(features[0]))]
