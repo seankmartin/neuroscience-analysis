@@ -103,8 +103,9 @@ class LFPDecoder(object):
 
     def set_features(self, features, feature_params={}):
         """Features can be either an array or a string, in which case it is made."""
-        if features == "window":
-            features = window_features(self.get_data(), **feature_params)
+        if type(features) is str:
+            if features == "window":
+                features = window_features(self.get_data(), **feature_params)
         elif isinstance(features, np.ndarray):
             if features.shape[0] != len(self.labels):
                 raise ValueError(
@@ -114,7 +115,7 @@ class LFPDecoder(object):
                 )
         else:
             raise ValueError("Unrecognised feature type {}".format(features))
-        self.features = features
+        self.features = np.nan_to_num(features)
 
     def get_features(self):
         """Return the features used for decoding."""
